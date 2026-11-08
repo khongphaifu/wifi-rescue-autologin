@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Runtime & Process files
+wifi-rescue.pid
+activity.log
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+desktop.ini
