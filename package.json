@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node test/test-wifi-state-fixes.js && node test/test-session-time-parser.js && node test/test-router-status-parser.js && node test/test-priority.js && node test/test-fix-context-destroyed.js",
+    "test": "node test/test-wifi-state-fixes.js && node test/test-session-time-parser.js && node test/test-router-status-parser.js && node test/test-priority.js && node test/test-fix-context-destroyed.js && node test/test-dashboard.js",
     "test-all": "npm test && node test/test-puppeteer.js && node test/test-portal-two-steps-real.js && node test/test-portal-retry.js && node test/test-portal-simulation.js",
     "test-wifi": "node src/wifi.js",
     "test-portal": "node src/portal.js"
