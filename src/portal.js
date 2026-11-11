@@ -135,12 +135,30 @@ async function solveCaptivePortal(options = {}) {
     // 1. Tải trang Portal với cơ chế Retry & Tự Chữa Trang Trắng
     let loaded = false;
     for (let attempt = 1; attempt <= config.maxPortalRetries; attempt++) {
-      console.log(`[PORTAL] Đang nạp trang ${config.portalUrl} (Lần thử ${attempt}/${config.maxPortalRetries})...`);
+      const targetUrl = (attempt % 2 === 1) ? (config.portalStatusUrl || config.portalUrl) : config.portalUrl;
+      console.log(`[PORTAL] Đang nạp trang ${targetUrl} (Lần thử ${attempt}/${config.maxPortalRetries})...`);
       try {
-        await page.goto(config.portalUrl, {
+        await page.goto(targetUrl, {
           waitUntil: 'domcontentloaded',
           timeout: config.pageTimeoutMs
         });
+
+        // Tự động kiểm tra và theo dõi chuyển hướng meta-refresh (nếu có)
+        const metaRefresh = await safeEvaluate(page, () => {
+          const meta = document.querySelector('meta[http-equiv="refresh"]');
+          if (meta) {
+            const content = meta.getAttribute('content') || '';
+            const match = content.match(/url=([^;]+)/i);
+            return match ? match[1].trim() : null;
+          }
+          return null;
+        }, null);
+
+        if (metaRefresh) {
+          try {
+            await page.goto(metaRefresh, { waitUntil: 'domcontentloaded', timeout: 5000 });
+          } catch (e) {}
+        }
 
         // Chờ ngắn để các mã chuyển hướng nội bộ của router / React ổn định
         await sleep(800);

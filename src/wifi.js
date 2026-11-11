@@ -55,6 +55,7 @@ function getCurrentConnection() {
     let state = 'disconnected';
     let ssid = '';
     let signal = '';
+    let mac = '';
 
     for (const line of lines) {
       const trimmed = line.trim();
@@ -70,6 +71,8 @@ function getCurrentConnection() {
         ssid = val;
       } else if (key === 'signal' || key === 'tín hiệu') {
         signal = val;
+      } else if (key === 'physical address' || key === 'địa chỉ thực') {
+        mac = val.toUpperCase();
       }
     }
 
@@ -89,13 +92,16 @@ function getCurrentConnection() {
       && !isConnecting;
 
     const hasValidSsid = Boolean(ssid && ssid.trim().length > 0);
+    const macEsc = mac ? encodeURIComponent(mac) : '';
 
     return {
       connected: isStateConnected && hasValidSsid,
       isConnecting,
       state,
       ssid: ssid.trim(),
-      signal
+      signal,
+      mac,
+      macEsc
     };
   } catch (err) {
     return {
@@ -361,6 +367,13 @@ function directTrialLogin(macEscInput = null) {
     if (macEscInput) {
       execute(macEscInput, config.portalLoginUrl);
     } else {
+      // Ưu tiên 1: Lấy MAC trực tiếp từ card mạng (nhanh tức thì 0ms, không phụ thuộc router)
+      const conn = getCurrentConnection();
+      if (conn && conn.macEsc) {
+        return execute(conn.macEsc, config.portalLoginUrl);
+      }
+
+      // Ưu tiên 2: Truy vấn router
       getRouterSessionInfo(2000).then(info => {
         const mac = (info && info.macEsc) ? info.macEsc : null;
         execute(mac, info && info.linkLoginOnly ? info.linkLoginOnly : config.portalLoginUrl);
