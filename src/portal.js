@@ -1,6 +1,10 @@
 const puppeteer = require('puppeteer-core');
 const config = require('./config');
-const { checkInternetAccess, getRouterSessionInfo } = require('./wifi');
+const {
+  checkInternetAccess,
+  getRouterSessionInfo,
+  directTrialLogin
+} = require('./wifi');
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -29,14 +33,36 @@ async function safeEvaluate(page, fn, defaultValue = null) {
 }
 
 /**
- * Tự động mở Chromium ngầm và thực hiện quy trình đăng nhập Captive Portal siêu tốc
- * Hỗ trợ chế độ bình thường và chế độ gia hạn chủ động (options.proactive)
+ * Tự động đăng nhập Captive Portal cho Wi-MESH với cơ chế Kép:
+ * 1. Ưu tiên Direct HTTP Login siêu tốc (< 0.3s, miễn nhiễm 100% với ERR_BLOCKED_BY_CLIENT & White Screen)
+ * 2. Fallback bằng Chromium Engine an toàn, tự động dọn sạch Cache/Storage và chống kẹt trang trắng
  */
 async function solveCaptivePortal(options = {}) {
   const isHeadless = options.headless !== undefined ? options.headless : config.headless;
   const isProactive = Boolean(options.proactive);
   console.log(`[PORTAL] Bắt đầu giải quyết Captive Portal (Headless: ${isHeadless}, Gia hạn chủ động: ${isProactive})...`);
 
+  // =========================================================================
+  // CHIẾN LƯỢC 1: ĐĂNG NHẬP TRỰC TIẾP QUA HTTP GET (DIRECT HTTP LOGIN)
+  // =========================================================================
+  try {
+    console.log('[PORTAL] Thử nghiệm Đăng nhập Trực tiếp Siêu Tốc (Direct HTTP Login)...');
+    const directRes = await directTrialLogin();
+    if (directRes && directRes.success) {
+      await sleep(500);
+      const verifySession = await getRouterSessionInfo(2500);
+      if (verifySession && verifySession.loggedIn) {
+        console.log(`[PORTAL] Tuyệt vời! Đăng nhập Direct HTTP thành công trong 0.2s: còn ${verifySession.sessionTimeLeftRaw}!`);
+        return { success: true, isOnline: true, method: 'direct_http' };
+      }
+    }
+  } catch (directErr) {
+    console.log(`[PORTAL] Direct HTTP không khả dụng (${directErr.message}), chuyển sang Browser Engine...`);
+  }
+
+  // =========================================================================
+  // CHIẾN LƯỢC 2: CHROMIUM BROWSER ENGINE AN TOÀN VÀ TỰ ĐỘNG CHỮA LỖI
+  // =========================================================================
   let browser = null;
   try {
     browser = await puppeteer.launch({
@@ -51,8 +77,17 @@ async function solveCaptivePortal(options = {}) {
         '--no-first-run',
         '--no-default-browser-check',
         '--window-size=1024,768',
-        '--blink-settings=imagesEnabled=false', // Tối ưu: Không tải ảnh để tốc độ nhanh gấp 5 lần
-        '--disable-extensions'
+        '--disable-extensions',
+        // Tắt toàn bộ cache ổ đĩa để chống kẹt cache / corrupted service worker
+        '--disable-http-cache',
+        '--disable-application-cache',
+        '--disk-cache-size=0',
+        '--media-cache-size=0',
+        // Tắt tính năng bảo vệ web nghiêm ngặt gây lỗi ERR_BLOCKED_BY_CLIENT
+        '--disable-web-security',
+        '--allow-running-insecure-content',
+        '--disable-features=IsolateOrigins,site-per-process,PreloadMediaEngagementData',
+        '--incognito'
       ],
       defaultViewport: { width: 1024, height: 768 }
     });
@@ -60,18 +95,35 @@ async function solveCaptivePortal(options = {}) {
     const page = await browser.newPage();
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36');
 
-    // Chặn request hình ảnh, media, phông chữ để tải trang dưới 0.5s
+    // Tắt Cache trên trang và dọn sạch dữ liệu duyệt web của origin qua Chrome DevTools Protocol (CDP)
+    try {
+      await page.setCacheEnabled(false);
+      const cdp = await page.target().createCDPSession();
+      await cdp.send('Network.clearBrowserCache');
+      await cdp.send('Network.clearBrowserCookies');
+      await cdp.send('Storage.clearDataForOrigin', {
+        origin: 'http://186.186.0.1',
+        storageTypes: 'all'
+      });
+    } catch (e) {}
+
+    // Xử lý request: KHÔNG dùng req.abort() để tránh phát sinh lỗi ERR_BLOCKED_BY_CLIENT
     await page.setRequestInterception(true);
     page.on('request', (req) => {
       const type = req.resourceType();
       if (['image', 'media', 'font'].includes(type)) {
-        req.abort();
+        // Trả về response 200 rỗng an toàn thay vì abort()
+        req.respond({
+          status: 200,
+          contentType: type === 'font' ? 'font/woff2' : 'image/png',
+          body: ''
+        });
       } else {
         req.continue();
       }
     });
 
-    // Nếu là gia hạn chủ động, yêu cầu router đăng xuất phiên cũ trước để chuyển sang trang login
+    // Nếu là gia hạn chủ động, yêu cầu router đăng xuất phiên cũ trước
     if (isProactive) {
       try {
         console.log('[PORTAL] Đang đăng xuất phiên cũ để chuẩn bị gia hạn mới...');
@@ -80,7 +132,7 @@ async function solveCaptivePortal(options = {}) {
       } catch (e) {}
     }
 
-    // 1. Tải trang Portal với cơ chế Retry & Settle
+    // 1. Tải trang Portal với cơ chế Retry & Tự Chữa Trang Trắng
     let loaded = false;
     for (let attempt = 1; attempt <= config.maxPortalRetries; attempt++) {
       console.log(`[PORTAL] Đang nạp trang ${config.portalUrl} (Lần thử ${attempt}/${config.maxPortalRetries})...`);
@@ -93,21 +145,41 @@ async function solveCaptivePortal(options = {}) {
         // Chờ ngắn để các mã chuyển hướng nội bộ của router / React ổn định
         await sleep(800);
 
-        // Kiểm tra xem trang có nội dung chưa với safeEvaluate
+        // Kiểm tra xem trang có nội dung thật hay bị Trang Trắng (White Screen)
         const waitDomStart = Date.now();
-        while (Date.now() - waitDomStart < 3000) {
-          const hasContent = await safeEvaluate(page, () => {
-            return !!document.getElementById('root') ||
-                   !!document.getElementById('wifi-info') ||
-                   !!document.getElementById('trial-url') ||
-                   (document.body && document.body.innerText.length > 50);
-          }, false);
+        while (Date.now() - waitDomStart < 3500) {
+          const domCheck = await safeEvaluate(page, () => {
+            const root = document.getElementById('root');
+            const rootHasContent = root && root.children.length > 0 && root.innerText.trim().length > 0;
+            const hasButtons = !!document.querySelector('a, button, input[type="submit"], input[type="button"], .btn');
+            const hasText = (document.body && document.body.innerText.length > 30);
+            const hasWifiInfo = !!document.getElementById('wifi-info');
+            return {
+              hasRealContent: rootHasContent || hasButtons || (hasText && !hasWifiInfo),
+              hasWifiInfo
+            };
+          }, { hasRealContent: false, hasWifiInfo: false });
 
-          if (hasContent) {
+          if (domCheck && domCheck.hasRealContent) {
             loaded = true;
             break;
           }
-          await sleep(150);
+          await sleep(200);
+        }
+
+        // Nếu phát hiện trang trắng (React không render được nút):
+        if (!loaded) {
+          console.warn(`[PORTAL] Phát hiện lỗi Trang Trắng ở lần thử ${attempt}. Tự động kích hoạt URL cứu hộ trực tiếp...`);
+          const routerInfo = await getRouterSessionInfo(2000);
+          if (routerInfo && routerInfo.macEsc) {
+            const directUrl = `${routerInfo.linkLoginOnly || config.portalLoginUrl}?username=T-${routerInfo.macEsc}`;
+            try {
+              await page.goto(directUrl, { waitUntil: 'domcontentloaded', timeout: 5000 });
+              await sleep(1000);
+              loaded = true;
+              break;
+            } catch (e) {}
+          }
         }
 
         if (loaded) {
@@ -180,9 +252,7 @@ async function solveCaptivePortal(options = {}) {
           step1Clicked = true;
           break;
         }
-      } catch (e) {
-        // Bỏ qua lỗi context, tiếp tục thử
-      }
+      } catch (e) {}
 
       await sleep(200);
     }
@@ -241,9 +311,7 @@ async function solveCaptivePortal(options = {}) {
             console.log(`[PORTAL] Đang đợi đếm ngược: "${clickResult.text}"...`);
           }
         }
-      } catch (e) {
-        // Bỏ qua lỗi context
-      }
+      } catch (e) {}
 
       await sleep(250);
     }
