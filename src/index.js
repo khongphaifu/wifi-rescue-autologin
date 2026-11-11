@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 const config = require('./config');
 const {
   getCurrentConnection,
@@ -26,6 +27,33 @@ function log(msg) {
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function checkSingleInstance() {
+  if (fs.existsSync(LOCK_FILE)) {
+    try {
+      const content = fs.readFileSync(LOCK_FILE, 'utf-8').trim();
+      const existingPid = parseInt(content, 10);
+      if (existingPid && existingPid !== process.pid) {
+        process.kill(existingPid, 0); // Kiểm tra PID còn sống không
+        try {
+          const out = execSync(`powershell -NoProfile -Command "(Get-CimInstance Win32_Process -Filter 'ProcessId = ${existingPid}').CommandLine"`, {
+            encoding: 'utf-8',
+            timeout: 2500
+          });
+          if (out.includes('index.js') || out.includes('wifi-rescue')) {
+            console.log(`[THÔNG BÁO] Wi-Fi Rescue (PID: ${existingPid}) đang chạy ngầm rồi. Tiến trình này tự động dừng.`);
+            process.exit(0);
+          }
+        } catch (e) {
+          console.log(`[THÔNG BÁO] Tiến trình PID ${existingPid} đang hoạt động. Dừng tiến trình mới.`);
+          process.exit(0);
+        }
+      }
+    } catch (e) {
+      // Tiến trình cũ không tồn tại (ESRCH), an toàn tiếp tục
+    }
+  }
 }
 
 function writePid() {
@@ -63,9 +91,10 @@ process.on('SIGTERM', () => {
 });
 
 async function runDaemon() {
+  checkSingleInstance();
   writePid();
   log('================================================================');
-  log(`BẮT ĐẦU DỊCH VỤ TỰ ĐỘNG KẾT NỐI WI-FI V2.3 (BẢN QUÉT SÓNG THÔNG MINH): "${config.ssid}"`);
+  log(`BẮT ĐẦU DỊCH VỤ TỰ ĐỘNG KẾT NỐI WI-FI V2.4 (DUAL-ENGINE SIÊU TỐC): "${config.ssid}"`);
   log(`PID: ${process.pid} | Trình duyệt: ${config.chromePath}`);
   log(`Cơ chế: Chỉ gửi tín hiệu khi CÓ SÓNG | Độ ưu tiên thấp nhất | Ân hạn 12s | Chống spam`);
   log('================================================================');
