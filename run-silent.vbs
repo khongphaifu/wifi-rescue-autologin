@@ -8,4 +8,6 @@ If fso.FileExists("C:\Program Files\nodejs\node.exe") Then
     nodeExe = """C:\Program Files\nodejs\node.exe"""
 End If
 
-WshShell.Run nodeExe & " src/index.js", 0, False
+targetScript = """" & scriptDir & "\src\index.js"""
+cmd = nodeExe & " " & targetScript
+WshShell.Run cmd, 0, False

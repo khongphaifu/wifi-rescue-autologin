@@ -11,10 +11,12 @@ Write-Host "==============================================================" -For
 
 $vbsPath = Join-Path $rootDir "run-silent.vbs"
 
+$wscriptExe = "$env:WINDIR\System32\wscript.exe"
+
 # 1. Cấu hình Windows Registry Run (Khởi động tức thì 0 giây độ trễ khi mở máy)
 $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
 $regName = "WifiRescueAutoLogin"
-$regValue = "wscript.exe `"$vbsPath`""
+$regValue = "`"$wscriptExe`" `"$vbsPath`""
 
 try {
     Set-ItemProperty -Path $regPath -Name $regName -Value $regValue -Force
@@ -30,7 +32,7 @@ $shortcutPath = Join-Path $startupDir "WifiRescueAutoLogin.lnk"
 try {
     $ws = New-Object -ComObject WScript.Shell
     $shortcut = $ws.CreateShortcut($shortcutPath)
-    $shortcut.TargetPath = "wscript.exe"
+    $shortcut.TargetPath = $wscriptExe
     $shortcut.Arguments = "`"$vbsPath`""
     $shortcut.WorkingDirectory = $rootDir
     $shortcut.Description = "Wifi Rescue Auto Login Daemon"
@@ -43,10 +45,10 @@ try {
     Write-Host "[CẢNH BÁO] Không thể tạo shortcut Startup: $($_.Exception.Message)" -ForegroundColor Yellow
 }
 
-# 3. Thiết lập độ ưu tiên mạng cứu hộ thấp nhất trong Windows
-netsh wlan set profileorder name="Free Wi-MESH-Rescue" interface="Wi-Fi" priority=999 >$null 2>&1
-netsh wlan set profileorder name="Free Wi-MESH - Rescue" interface="Wi-Fi" priority=999 >$null 2>&1
-netsh wlan set profileorder name="1.Free Wi-MESH" interface="Wi-Fi" priority=999 >$null 2>&1
+# 3. Đưa mạng Free Wi-MESH-Rescue lên Ưu tiên SỐ 1 để Windows tự động bắt sóng ngay khi bật máy
+netsh wlan set profileorder name="Free Wi-MESH-Rescue" interface="Wi-Fi" priority=1 >$null 2>&1
+netsh wlan set profileorder name="Free Wi-MESH - Rescue" interface="Wi-Fi" priority=2 >$null 2>&1
+netsh wlan set profileorder name="1.Free Wi-MESH" interface="Wi-Fi" priority=3 >$null 2>&1
 
 Write-Host "--------------------------------------------------------------" -ForegroundColor Gray
 Write-Host "TRẠNG THÁI: Tự động chạy ngầm ngay khi vừa bật/đăng nhập Windows!" -ForegroundColor Cyan
