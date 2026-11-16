@@ -38,8 +38,10 @@ async function runTests() {
   assert.ok(xmlWithMac.includes('http://186.186.0.1/login?username=T-14%3AAC%3A60%3AEA%3AA0%3AFB'), 'WebClip phải trỏ đúng link Direct Login kèm MAC');
 
   const xmlGeneric = generateMobileConfig({ mac: 'invalid-mac' });
-  assert.ok(!xmlGeneric.includes('?username=T-'), 'MAC không hợp lệ không được sinh WebClip sai');
-  assert.ok(xmlGeneric.includes('http://186.186.0.1/status'), 'Vẫn phải có WebClip Trạng Thái');
+  assert.ok(!xmlGeneric.includes('?username=T-'), 'MAC không hợp lệ không được sinh URL kèm T- sai');
+  assert.ok(xmlGeneric.includes('⚡ Wi-Fi Rescue'), 'Luôn phải có WebClip ⚡ Wi-Fi Rescue ngay cả khi không nhập MAC');
+  assert.ok(xmlGeneric.includes('<key>Icon</key>') && xmlGeneric.includes('<data>'), 'WebClip phải có ảnh Icon Base64');
+  assert.ok(xmlGeneric.includes('http://186.186.0.1/login') && xmlGeneric.includes('http://186.186.0.1/status'), 'Phải có cả link Login và Trạng Thái');
   console.log('  ✓ ios/profile-generator.js: DTD Plist, CaptiveBypass, DisableMACRandomization & WebClip hợp lệ');
 
   // 2. Test ARP parser & IP normalization

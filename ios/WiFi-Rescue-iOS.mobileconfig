@@ -26,7 +26,7 @@
         <key>PayloadType</key>
         <string>com.apple.wifi.managed</string>
         <key>PayloadUUID</key>
-        <string>91598F1E-CDE1-4732-8EA4-BC8244D9A304</string>
+        <string>AC47C455-36DF-4406-B0E2-120E185006E2</string>
         <key>PayloadVersion</key>
         <integer>1</integer>
         <key>SSID_STR</key>
@@ -54,7 +54,7 @@
         <key>PayloadType</key>
         <string>com.apple.wifi.managed</string>
         <key>PayloadUUID</key>
-        <string>995471D5-2599-412C-B0F9-31B7FAD8B50E</string>
+        <string>740B8555-07BD-4C6A-A425-D8370F22915E</string>
         <key>PayloadVersion</key>
         <integer>1</integer>
         <key>SSID_STR</key>
@@ -82,7 +82,7 @@
         <key>PayloadType</key>
         <string>com.apple.wifi.managed</string>
         <key>PayloadUUID</key>
-        <string>FCDDB44E-3777-49D6-88CE-99B285FE573D</string>
+        <string>EC93C748-C609-4B43-A53A-B94BD6E0995B</string>
         <key>PayloadVersion</key>
         <integer>1</integer>
         <key>SSID_STR</key>
@@ -91,6 +91,36 @@
       <dict>
         <key>FullScreen</key>
         <false/>
+        <key>Icon</key>
+        <data>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAB9ElEQVR4nOXQR46UAQyE0boEy7oSSeQgchA5iBxEDiLDtThAnYVNoZ7VLFqtMbL9I3nx1v5c4G55MnCPPBm4V54M3CdPBu6XJwMPyJOBB+XJwEPyZOBheTLwiDwZeFSeDDwmTwYel7v8+b0rpKMJPCF3CT3f1ASelLuEBmhqAk/JHULPNzWtgKflDqEBmppWwDNytdDzDT3bgWflaqEBGnq2A8/JlULPF7esA56XK4UGKG5ZB7wgVwk9X9ixCXhRrhIaoLBjE/CSXCU0QGHHJuBluULo+aKGnQCvyBVCAxQ17AR4Vc4Wer7gfgR4Tc4WGqDgfgR4Xc4Uej759r8Ab8iZIgNEZbeugDflLJXPrx0koRm8JWdpHyChGbwtZ+h+fmuAhG7wjpyh/fmkbvCunKF9gKRu8J5cofT5xE7wvvw/CA2QeBd8IC8t9HzybfChvLTQAMm3wUfykkLPF9wHH8tLCg1QcB98Ii8l9HxRA/hUXkpogKIG8Jm8lNAARQ3gc3kJoecLO8AX8hJCAxR2gC/lbqHni1vAV3K30ADFLeBruVPo+YYe8I3cKTRAQw/4Vu4Ser6pCXwndwkN0NQEvpc7RJ7fGqCpC/wgTwZ+lCcDP8mTgZ/lycAv8mTgV3ky8Js8Gfhdngz8IU8G/pQnA3/Jk/0FUMhOH2ruq7YAAAAASUVORK5CYII=</data>
+        <key>IgnoreManifestScope</key>
+        <false/>
+        <key>IsRemovable</key>
+        <true/>
+        <key>Label</key>
+        <string>⚡ Wi-Fi Rescue</string>
+        <key>PayloadDescription</key>
+        <string>Nut kich hoat nhanh Wi-Fi Rescue 0.2s</string>
+        <key>PayloadDisplayName</key>
+        <string>⚡ Wi-Fi Rescue</string>
+        <key>PayloadIdentifier</key>
+        <string>com.wifirescue.autologin.webclip.login</string>
+        <key>PayloadType</key>
+        <string>com.apple.webclip.managed</string>
+        <key>PayloadUUID</key>
+        <string>6E2C358D-A2D3-4361-806D-DCA195E75F8C</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>Precomposed</key>
+        <false/>
+        <key>URL</key>
+        <string>http://186.186.0.1/login</string>
+      </dict>
+      <dict>
+        <key>FullScreen</key>
+        <false/>
+        <key>Icon</key>
+        <data>iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAB9ElEQVR4nOXQR46UAQyE0boEy7oSSeQgchA5iBxEDiLDtThAnYVNoZ7VLFqtMbL9I3nx1v5c4G55MnCPPBm4V54M3CdPBu6XJwMPyJOBB+XJwEPyZOBheTLwiDwZeFSeDDwmTwYel7v8+b0rpKMJPCF3CT3f1ASelLuEBmhqAk/JHULPNzWtgKflDqEBmppWwDNytdDzDT3bgWflaqEBGnq2A8/JlULPF7esA56XK4UGKG5ZB7wgVwk9X9ixCXhRrhIaoLBjE/CSXCU0QGHHJuBluULo+aKGnQCvyBVCAxQ17AR4Vc4Wer7gfgR4Tc4WGqDgfgR4Xc4Uej759r8Ab8iZIgNEZbeugDflLJXPrx0koRm8JWdpHyChGbwtZ+h+fmuAhG7wjpyh/fmkbvCunKF9gKRu8J5cofT5xE7wvvw/CA2QeBd8IC8t9HzybfChvLTQAMm3wUfykkLPF9wHH8tLCg1QcB98Ii8l9HxRA/hUXkpogKIG8Jm8lNAARQ3gc3kJoecLO8AX8hJCAxR2gC/lbqHni1vAV3K30ADFLeBruVPo+YYe8I3cKTRAQw/4Vu4Ser6pCXwndwkN0NQEvpc7RJ7fGqCpC/wgTwZ+lCcDP8mTgZ/lycAv8mTgV3ky8Js8Gfhdngz8IU8G/pQnA3/Jk/0FUMhOH2ruq7YAAAAASUVORK5CYII=</data>
         <key>IgnoreManifestScope</key>
         <false/>
         <key>IsRemovable</key>
@@ -106,11 +136,11 @@
         <key>PayloadType</key>
         <string>com.apple.webclip.managed</string>
         <key>PayloadUUID</key>
-        <string>97D0BEDE-A4DC-46DA-8B82-3B5413897B93</string>
+        <string>EFB8E15A-99A3-4F97-B259-6B2C6AEE24CC</string>
         <key>PayloadVersion</key>
         <integer>1</integer>
         <key>Precomposed</key>
-        <true/>
+        <false/>
         <key>URL</key>
         <string>http://186.186.0.1/status</string>
       </dict>
@@ -128,7 +158,7 @@
     <key>PayloadType</key>
     <string>Configuration</string>
     <key>PayloadUUID</key>
-    <string>6535E763-BD6E-4B9D-9AEE-ADC66D584BD5</string>
+    <string>881AB117-15FF-4309-8DB6-0F60870ACFB3</string>
     <key>PayloadVersion</key>
     <integer>1</integer>
   </dict>

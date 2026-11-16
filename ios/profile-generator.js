@@ -77,11 +77,15 @@ function buildWifiPayload(ssid, index) {
       </dict>`;
 }
 
+const WEBCLIP_ICON_BASE64 = 'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAB9ElEQVR4nOXQR46UAQyE0boEy7oSSeQgchA5iBxEDiLDtThAnYVNoZ7VLFqtMbL9I3nx1v5c4G55MnCPPBm4V54M3CdPBu6XJwMPyJOBB+XJwEPyZOBheTLwiDwZeFSeDDwmTwYel7v8+b0rpKMJPCF3CT3f1ASelLuEBmhqAk/JHULPNzWtgKflDqEBmppWwDNytdDzDT3bgWflaqEBGnq2A8/JlULPF7esA56XK4UGKG5ZB7wgVwk9X9ixCXhRrhIaoLBjE/CSXCU0QGHHJuBluULo+aKGnQCvyBVCAxQ17AR4Vc4Wer7gfgR4Tc4WGqDgfgR4Xc4Uej759r8Ab8iZIgNEZbeugDflLJXPrx0koRm8JWdpHyChGbwtZ+h+fmuAhG7wjpyh/fmkbvCunKF9gKRu8J5cofT5xE7wvvw/CA2QeBd8IC8t9HzybfChvLTQAMm3wUfykkLPF9wHH8tLCg1QcB98Ii8l9HxRA/hUXkpogKIG8Jm8lNAARQ3gc3kJoecLO8AX8hJCAxR2gC/lbqHni1vAV3K30ADFLeBruVPo+YYe8I3cKTRAQw/4Vu4Ser6pCXwndwkN0NQEvpc7RJ7fGqCpC/wgTwZ+lCcDP8mTgZ/lycAv8mTgV3ky8Js8Gfhdngz8IU8G/pQnA3/Jk/0FUMhOH2ruq7YAAAAASUVORK5CYII=';
+
 function buildWebClipPayload(label, url, idSuffix) {
   const uuid = crypto.randomUUID().toUpperCase();
   return `      <dict>
         <key>FullScreen</key>
         <false/>
+        <key>Icon</key>
+        <data>${WEBCLIP_ICON_BASE64}</data>
         <key>IgnoreManifestScope</key>
         <false/>
         <key>IsRemovable</key>
@@ -101,7 +105,7 @@ function buildWebClipPayload(label, url, idSuffix) {
         <key>PayloadVersion</key>
         <integer>1</integer>
         <key>Precomposed</key>
-        <true/>
+        <false/>
         <key>URL</key>
         <string>${escapeXml(url)}</string>
       </dict>`;
@@ -122,10 +126,9 @@ function generateMobileConfig(options = {}) {
   const loginBase = config.portalLoginUrl || 'http://186.186.0.1/login';
   const statusBase = config.portalStatusUrl || 'http://186.186.0.1/status';
 
-  if (macInfo.valid) {
-    const directLoginUrl = `${loginBase}?username=T-${macInfo.macEsc}`;
-    payloads.push(buildWebClipPayload('⚡ Wi-Fi Rescue', directLoginUrl, 'login'));
-  }
+  // Always create the primary ⚡ Wi-Fi Rescue WebClip regardless of whether MAC was entered
+  const directLoginUrl = macInfo.valid ? `${loginBase}?username=T-${macInfo.macEsc}` : loginBase;
+  payloads.push(buildWebClipPayload('⚡ Wi-Fi Rescue', directLoginUrl, 'login'));
 
   // Always provide a Status WebClip so users can inspect remaining time or run the Bookmarklet anytime
   payloads.push(buildWebClipPayload('⏱️ Trạng Thái Wi-Fi', statusBase, 'status'));
