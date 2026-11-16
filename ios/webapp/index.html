@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Wi-Fi Rescue" />
+  <title>Wi-Fi Rescue iOS</title>
+  <style>
+    :root {
+      --bg: #080d1a;
+      --card: #111827;
+      --card-inner: #0b1120;
+      --border: #1f2937;
+      --accent: #38bdf8;
+      --primary: #2563eb;
+      --green: #22c55e;
+      --yellow: #eab308;
+      --red: #ef4444;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #172554 0%, var(--bg) 55%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+      padding: env(safe-area-inset-top, 16px) 16px env(safe-area-inset-bottom, 24px);
+      display: flex;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 430px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding-top: 10px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 4px 2px;
+    }
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.3px;
+      color: #fff;
+    }
+    .title-wrap p {
+      margin: 2px 0 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .pill.online { background: rgba(34, 197, 94, 0.16); color: #4ade80; border-color: rgba(34, 197, 94, 0.35); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+    }
+    .timer-label {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+    .timer-value {
+      text-align: center;
+      font-size: 58px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.05;
+      margin: 8px 0 12px;
+      color: var(--green);
+    }
+    .progress-track {
+      width: 100%;
+      height: 10px;
+      background: var(--card-inner);
+      border-radius: 999px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      transition: width 0.5s ease, background 0.3s ease;
+    }
+    .meta-box {
+      margin-top: 14px;
+      background: var(--card-inner);
+      border-radius: 14px;
+      padding: 12px;
+      font-size: 13px;
+      line-height: 1.65;
+      border: 1px solid rgba(255,255,255,0.04);
+    }
+    .meta-row { display: flex; justify-content: space-between; gap: 8px; }
+    .meta-key { color: var(--muted); }
+    .meta-val { font-weight: 600; color: #e2e8f0; text-align: right; word-break: break-all; }
+    label.field-label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+    .input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    input.mac-input {
+      flex: 1;
+      background: var(--card-inner);
+      border: 1px solid #334155;
+      border-radius: 12px;
+      padding: 11px 12px;
+      color: #fff;
+      font-size: 15px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      text-transform: uppercase;
+      outline: none;
+    }
+    input.mac-input:focus { border-color: var(--accent); }
+    .btn {
+      width: 100%;
+      border: none;
+      border-radius: 14px;
+      padding: 14px 16px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: transform 0.08s ease, opacity 0.2s ease;
+    }
+    .btn:active { transform: scale(0.98); }
+    .btn-primary { background: linear-gradient(135deg, #2563eb, #0284c7); color: #fff; }
+    .btn-success { background: linear-gradient(135deg, #16a34a, #15803d); color: #fff; }
+    .btn-secondary { background: #1e293b; color: #e2e8f0; border: 1px solid #334155; font-size: 14px; }
+    .btn-outline { background: transparent; color: var(--accent); border: 1px solid rgba(56, 189, 248, 0.35); font-size: 14px; }
+    .stack { display: flex; flex-direction: column; gap: 10px; }
+    .log-box {
+      font-size: 12px;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 12px;
+      padding: 10px 12px;
+      min-height: 38px;
+      line-height: 1.45;
+    }
+    .steps {
+      margin: 8px 0 0;
+      padding-left: 18px;
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .steps li strong { color: #e2e8f0; }
+    iframe.hidden-runner { width: 1px; height: 1px; opacity: 0; position: absolute; pointer-events: none; border: 0; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title-wrap">
+        <h1>Wi-Fi Rescue iOS</h1>
+        <p>Tự động kết nối Free Wi-MESH-Rescue (0.2s)</p>
+      </div>
+      <span id="status-pill" class="pill">SẴN SÀNG</span>
+    </div>
+
+    <div class="card">
+      <div class="timer-label">Thời gian phiên còn lại</div>
+      <div id="timer-display" class="timer-value">15:00</div>
+      <div class="progress-track">
+        <div id="progress-fill" class="progress-fill" style="width: 100%;"></div>
+      </div>
+      <div class="meta-box">
+        <div class="meta-row">
+          <span class="meta-key">IP iPhone:</span>
+          <span id="meta-ip" class="meta-val">Đang kiểm tra...</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">MAC phát hiện:</span>
+          <span id="meta-mac" class="meta-val">Chưa có</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <label class="field-label" for="mac-input">Địa chỉ MAC Wi-Fi của iPhone (Tự điền hoặc nhập tay)</label>
+      <div class="input-row">
+        <input id="mac-input" class="mac-input" type="text" placeholder="VD: 14:AC:60:EA:A0:FB" maxlength="25" />
+      </div>
+      <div style="font-size: 11.5px; color: var(--muted); margin: -6px 0 12px;">
+        Mẹo: Vào <strong>Cài đặt &gt; Wi-Fi &gt; (i)</strong> cạnh Free Wi-MESH-Rescue để kiểm tra đúng <em>Địa chỉ Wi-Fi</em>.
+      </div>
+
+      <div class="stack">
+        <button id="btn-activate" class="btn btn-primary">⚡ Kích Hoạt Mạng Ngay (0.2s)</button>
+        <button id="btn-keepalive" class="btn btn-secondary">🔇 Bật Giữ Mạng Ngầm (Tự Gia Hạn 14p15s)</button>
+      </div>
+
+      <div id="log-box" class="log-box" style="margin-top: 12px;">
+        Sẵn sàng kích hoạt trực tiếp qua http://186.186.0.1
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="timer-label" style="text-align:left; margin-bottom: 10px;">Cài Đặt Độc Lập Lên iPhone (Không Cần PC)</div>
+      <div class="stack">
+        <a id="btn-download-profile" class="btn btn-success" href="/profile.mobileconfig">
+          📥 Tải Cấu Hình Wi-Fi 1-Chạm (.mobileconfig)
+        </a>
+        <button id="btn-copy-bookmarklet" class="btn btn-outline">
+          📋 Copy Bookmarklet Cho Safari (Chạy Trên 186.186.0.1)
+        </button>
+        <a id="btn-download-scriptable" class="btn btn-secondary" href="/scriptable.js" download="WiFiRescue.js">
+          📱 Tải Widget Scriptable (.js)
+        </a>
+        <a class="btn btn-secondary" href="http://186.186.0.1/status" target="_blank" rel="noopener">
+          🌐 Mở Trang Trạng Thái Router (186.186.0.1)
+        </a>
+      </div>
+
+      <ol class="steps">
+        <li>Bấm <strong>Tải Cấu Hình Wi-Fi 1-Chạm</strong> ➔ Cho phép ➔ Vào <strong>Cài đặt &gt; Đã tải về hồ sơ</strong> để cài (mở khóa <em>CaptiveBypass</em> &amp; cố định MAC).</li>
+        <li>Nút <strong>⚡ Wi-Fi Rescue</strong> sẽ xuất hiện ngay trên Màn hình chính iPhone.</li>
+        <li>Hoặc lưu Bookmarklet vào Safari và chạy ngay khi mở <strong>186.186.0.1/status</strong> để có đồng hồ đếm ngược độc lập.</li>
+      </ol>
+    </div>
+  </div>
+
+  <iframe id="hidden-runner" class="hidden-runner" title="portal-runner"></iframe>
+
+  <script>
+    (function () {
+      var macInput = document.getElementById('mac-input');
+      var metaIp = document.getElementById('meta-ip');
+      var metaMac = document.getElementById('meta-mac');
+      var timerDisplay = document.getElementById('timer-display');
+      var progressFill = document.getElementById('progress-fill');
+      var statusPill = document.getElementById('status-pill');
+      var logBox = document.getElementById('log-box');
+      var btnActivate = document.getElementById('btn-activate');
+      var btnKeepAlive = document.getElementById('btn-keepalive');
+      var btnDownloadProfile = document.getElementById('btn-download-profile');
+      var btnCopyBookmarklet = document.getElementById('btn-copy-bookmarklet');
+      var hiddenRunner = document.getElementById('hidden-runner');
+
+      var state = {
+        secondsLeft: 900,
+        timerRunning: false,
+        keepAlive: false,
+        audioCtx: null,
+        silentAudio: null,
+        wakeLock: null
+      };
+
+      function log(msg) {
+        logBox.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+      }
+
+      function normalizeMac(raw) {
+        if (!raw) return '';
+        var hex = String(raw).replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+        if (hex.length !== 12) return raw.trim().toUpperCase();
+        return hex.match(/.{2}/g).join(':');
+      }
+
+      function updateProfileHref() {
+        var clean = normalizeMac(macInput.value);
+        if (clean.length === 17) {
+          localStorage.setItem('wr_iphone_mac', clean);
+          btnDownloadProfile.href = '/profile.mobileconfig?mac=' + encodeURIComponent(clean);
+        } else {
+          btnDownloadProfile.href = '/profile.mobileconfig';
+        }
+      }
+
+      function renderClock() {
+        var s = Math.max(0, state.secondsLeft);
+        var mm = String(Math.floor(s / 60)).padStart(2, '0');
+        var ss = String(s % 60).padStart(2, '0');
+        timerDisplay.textContent = mm + ':' + ss;
+        var pct = Math.max(0, Math.min(100, Math.round((s / 900) * 100)));
+        progressFill.style.width = pct + '%';
+        var color = s <= 60 ? '#ef4444' : (s <= 180 ? '#eab308' : '#22c55e');
+        timerDisplay.style.color = color;
+        progressFill.style.background = color;
+      }
+
+      function fireDirectLogin(forceLogout) {
+        var mac = normalizeMac(macInput.value);
+        if (!mac || mac.length !== 17) {
+          log('Vui lòng nhập đúng địa chỉ MAC iPhone (VD: 14:AC:60:EA:A0:FB) hoặc mở 186.186.0.1/status.');
+          window.open('http://186.186.0.1/login', '_blank');
+          return;
+        }
+        macInput.value = mac;
+        updateProfileHref();
+
+        var encodedMac = encodeURIComponent(mac);
+        var loginUrl = 'http://186.186.0.1/login?username=T-' + encodedMac + '&_ts=' + Date.now();
+
+        if (forceLogout) {
+          try { fetch('http://186.186.0.1/logout', { mode: 'no-cors', cache: 'no-store' }); } catch (e) {}
+        }
+
+        try {
+          fetch(loginUrl, { mode: 'no-cors', cache: 'no-store' }).catch(function () {});
+        } catch (e) {}
+        hiddenRunner.src = loginUrl;
+
+        state.secondsLeft = 900;
+        state.timerRunning = true;
+        statusPill.textContent = 'ĐÃ KÍCH HOẠT';
+        statusPill.className = 'pill online';
+        renderClock();
+        log('Đã gửi lệnh cấp mạng 0.2s cho MAC ' + mac + '!');
+      }
+
+      function toggleKeepAlive() {
+        if (state.keepAlive) {
+          state.keepAlive = false;
+          if (state.silentAudio) state.silentAudio.pause();
+          if (state.audioCtx) { try { state.audioCtx.close(); } catch (e) {} state.audioCtx = null; }
+          if (state.wakeLock) { try { state.wakeLock.release(); } catch (e) {} state.wakeLock = null; }
+          btnKeepAlive.textContent = '🔇 Bật Giữ Mạng Ngầm (Tự Gia Hạn 14p15s)';
+          btnKeepAlive.className = 'btn btn-secondary';
+          log('Đã tắt chế độ giữ mạng ngầm.');
+          return;
+        }
+
+        try {
+          var silentWav = 'data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA';
+          if (!state.silentAudio) {
+            state.silentAudio = new Audio(silentWav);
+            state.silentAudio.loop = true;
+            state.silentAudio.volume = 0.01;
+          }
+          state.silentAudio.play().catch(function () {});
+
+          var AC = window.AudioContext || window.webkitAudioContext;
+          if (AC && !state.audioCtx) {
+            state.audioCtx = new AC();
+            var osc = state.audioCtx.createOscillator();
+            var gain = state.audioCtx.createGain();
+            gain.gain.value = 0.0001;
+            osc.connect(gain);
+            gain.connect(state.audioCtx.destination);
+            osc.start();
+          }
+          if ('mediaSession' in navigator) {
+            navigator.mediaSession.metadata = new MediaMetadata({
+              title: 'Wi-Fi Rescue Keep-Alive',
+              artist: 'Free Wi-MESH-Rescue'
+            });
+          }
+          if (navigator.wakeLock && navigator.wakeLock.request) {
+            navigator.wakeLock.request('screen').then(function (wl) { state.wakeLock = wl; }).catch(function () {});
+          }
+          state.keepAlive = true;
+          state.timerRunning = true;
+          btnKeepAlive.textContent = '🔊 ĐANG GIỮ MẠNG NGẦM (Bấm để tắt)';
+          btnKeepAlive.className = 'btn btn-success';
+          log('Đã bật Silent Audio Keep-Alive! Sẽ tự gia hạn khi đồng hồ <= 00:45.');
+        } catch (err) {
+          log('Không thể bật giữ ngầm: ' + err.message);
+        }
+      }
+
+      macInput.addEventListener('input', updateProfileHref);
+      btnActivate.addEventListener('click', function () { fireDirectLogin(true); });
+      btnKeepAlive.addEventListener('click', toggleKeepAlive);
+
+      btnCopyBookmarklet.addEventListener('click', async function () {
+        try {
+          var res = await fetch('/bookmarklet.txt');
+          if (!res.ok) throw new Error('Không tải được mã Bookmarklet');
+          var code = await res.text();
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(code);
+            log('Đã copy mã Bookmarklet! Hãy dán vào URL của 1 Dấu trang Safari.');
+          } else {
+            prompt('Copy toàn bộ đoạn mã dưới đây vào Bookmark Safari:', code);
+          }
+        } catch (err) {
+          log('Hãy mở file ios/bookmarklet/bookmarklet-url.txt trên PC để copy.');
+        }
+      });
+
+      /* Fetch iPhone MAC detected via PC ARP table if hosted via mobile-server.js */
+      fetch('/api/client-info')
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.clientIp) metaIp.textContent = data.clientIp;
+          if (data.clientMac) {
+            metaMac.textContent = data.clientMac;
+            if (!macInput.value) macInput.value = data.clientMac;
+          } else {
+            metaMac.textContent = 'Không tìm thấy trong ARP (Nhập tay)';
+          }
+          if (data.router && data.router.loggedIn && data.router.sessionSecondsLeft > 0) {
+            state.secondsLeft = data.router.sessionSecondsLeft;
+            state.timerRunning = true;
+            statusPill.textContent = 'ONLINE';
+            statusPill.className = 'pill online';
+          }
+          updateProfileHref();
+          renderClock();
+        })
+        .catch(function () {
+          var saved = localStorage.getItem('wr_iphone_mac');
+          if (saved) macInput.value = saved;
+          metaIp.textContent = 'Chế độ Độc lập';
+          updateProfileHref();
+          renderClock();
+        });
+
+      setInterval(function () {
+        if (state.timerRunning && state.secondsLeft > 0) {
+          state.secondsLeft--;
+          renderClock();
+          if (state.keepAlive && state.secondsLeft <= 45) {
+            log('Còn <= 45s -> Tự động gia hạn chu kỳ mới!');
+            fireDirectLogin(true);
+          }
+        }
+      }, 1000);
+    })();
+  </script>
+</body>
+</html>

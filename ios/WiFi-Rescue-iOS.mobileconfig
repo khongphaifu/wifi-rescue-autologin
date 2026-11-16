@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>PayloadContent</key>
+    <array>
+      <dict>
+        <key>AutoJoin</key>
+        <true/>
+        <key>CaptiveBypass</key>
+        <true/>
+        <key>DisableAssociationMACRandomization</key>
+        <true/>
+        <key>EncryptionType</key>
+        <string>None</string>
+        <key>HIDDEN_NETWORK</key>
+        <false/>
+        <key>IsHotspot</key>
+        <false/>
+        <key>PayloadDescription</key>
+        <string>Cau hinh tu dong ket noi va vuot Captive cho Free Wi-MESH-Rescue</string>
+        <key>PayloadDisplayName</key>
+        <string>Wi-Fi: Free Wi-MESH-Rescue</string>
+        <key>PayloadIdentifier</key>
+        <string>com.wifirescue.autologin.wifi.1</string>
+        <key>PayloadType</key>
+        <string>com.apple.wifi.managed</string>
+        <key>PayloadUUID</key>
+        <string>91598F1E-CDE1-4732-8EA4-BC8244D9A304</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>SSID_STR</key>
+        <string>Free Wi-MESH-Rescue</string>
+      </dict>
+      <dict>
+        <key>AutoJoin</key>
+        <true/>
+        <key>CaptiveBypass</key>
+        <true/>
+        <key>DisableAssociationMACRandomization</key>
+        <true/>
+        <key>EncryptionType</key>
+        <string>None</string>
+        <key>HIDDEN_NETWORK</key>
+        <false/>
+        <key>IsHotspot</key>
+        <false/>
+        <key>PayloadDescription</key>
+        <string>Cau hinh tu dong ket noi va vuot Captive cho Free Wi-MESH - Rescue</string>
+        <key>PayloadDisplayName</key>
+        <string>Wi-Fi: Free Wi-MESH - Rescue</string>
+        <key>PayloadIdentifier</key>
+        <string>com.wifirescue.autologin.wifi.2</string>
+        <key>PayloadType</key>
+        <string>com.apple.wifi.managed</string>
+        <key>PayloadUUID</key>
+        <string>995471D5-2599-412C-B0F9-31B7FAD8B50E</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>SSID_STR</key>
+        <string>Free Wi-MESH - Rescue</string>
+      </dict>
+      <dict>
+        <key>AutoJoin</key>
+        <true/>
+        <key>CaptiveBypass</key>
+        <true/>
+        <key>DisableAssociationMACRandomization</key>
+        <true/>
+        <key>EncryptionType</key>
+        <string>None</string>
+        <key>HIDDEN_NETWORK</key>
+        <false/>
+        <key>IsHotspot</key>
+        <false/>
+        <key>PayloadDescription</key>
+        <string>Cau hinh tu dong ket noi va vuot Captive cho 1.Free Wi-MESH</string>
+        <key>PayloadDisplayName</key>
+        <string>Wi-Fi: 1.Free Wi-MESH</string>
+        <key>PayloadIdentifier</key>
+        <string>com.wifirescue.autologin.wifi.3</string>
+        <key>PayloadType</key>
+        <string>com.apple.wifi.managed</string>
+        <key>PayloadUUID</key>
+        <string>FCDDB44E-3777-49D6-88CE-99B285FE573D</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>SSID_STR</key>
+        <string>1.Free Wi-MESH</string>
+      </dict>
+      <dict>
+        <key>FullScreen</key>
+        <false/>
+        <key>IgnoreManifestScope</key>
+        <false/>
+        <key>IsRemovable</key>
+        <true/>
+        <key>Label</key>
+        <string>⏱️ Trạng Thái Wi-Fi</string>
+        <key>PayloadDescription</key>
+        <string>Nut kich hoat nhanh Wi-Fi Rescue 0.2s</string>
+        <key>PayloadDisplayName</key>
+        <string>⏱️ Trạng Thái Wi-Fi</string>
+        <key>PayloadIdentifier</key>
+        <string>com.wifirescue.autologin.webclip.status</string>
+        <key>PayloadType</key>
+        <string>com.apple.webclip.managed</string>
+        <key>PayloadUUID</key>
+        <string>97D0BEDE-A4DC-46DA-8B82-3B5413897B93</string>
+        <key>PayloadVersion</key>
+        <integer>1</integer>
+        <key>Precomposed</key>
+        <true/>
+        <key>URL</key>
+        <string>http://186.186.0.1/status</string>
+      </dict>
+    </array>
+    <key>PayloadDescription</key>
+    <string>Bat CaptiveBypass &amp; co dinh dia chi MAC cho mang Free Wi-MESH-Rescue.</string>
+    <key>PayloadDisplayName</key>
+    <string>Wi-Fi Rescue Auto-Login (iOS)</string>
+    <key>PayloadIdentifier</key>
+    <string>com.wifirescue.autologin.profile</string>
+    <key>PayloadOrganization</key>
+    <string>Wi-Fi Rescue Project</string>
+    <key>PayloadRemovalDisallowed</key>
+    <false/>
+    <key>PayloadType</key>
+    <string>Configuration</string>
+    <key>PayloadUUID</key>
+    <string>6535E763-BD6E-4B9D-9AEE-ADC66D584BD5</string>
+    <key>PayloadVersion</key>
+    <integer>1</integer>
+  </dict>
+</plist>

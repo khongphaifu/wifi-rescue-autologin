@@ -44,6 +44,9 @@ Công cụ tự động kết nối và giải quyết Captive Portal cho mạng
 - **`stop.bat`**: Dừng dịch vụ đang chạy ngầm.
 - **`install-startup.bat`**: Cài đặt tự động chạy ngầm khi mở máy tính.
 - **`uninstall-startup.bat`**: Gỡ bỏ tự động chạy cùng Windows.
+- **`cai-dat-iphone.bat`**: **[MỚI - iOS]** Mở server QR cài đặt cấu hình `.mobileconfig` (`CaptiveBypass`), WebClip 1-chạm, Scriptable & Bookmarklet cho iPhone.
+- **`bat-phat-wifi-iphone.bat`**: **[MỚI - iOS]** Bật trạm phát Mobile Hotspot trên Laptop kèm mã QR để iPhone kết nối dùng mạng 24/7.
+- **`KE_HOACH_IPHONE.md`** & **`HUONG_DAN_IPHONE.md`**: Kiến trúc và hướng dẫn triển khai chi tiết trên iPhone (thư mục `ios/`).
 
 ## 🛠 Hướng Dẫn Nhanh
 - **Muốn xem còn bao nhiêu phút**: Nhấp đúp vào **`xem-thoi-gian.bat`** (đếm ngược trực tiếp) hoặc **`status.bat`** (xem nhanh tức thì).
