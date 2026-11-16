@@ -118,7 +118,9 @@ Interface: 186.186.10.19 --- 0x12
   execSync('node --check "' + injectPath + '"');
   const bookmarkletTxt = fs.readFileSync(path.join(__dirname, '..', 'ios', 'bookmarklet', 'bookmarklet-url.txt'), 'utf8');
   assert.ok(bookmarkletTxt.startsWith('javascript:'));
-  assert.ok(bookmarkletTxt.length < 1500, 'Bookmarklet phải ngắn gọn < 1500 ký tự để dán vừa trên Safari iOS');
+  assert.ok(bookmarkletTxt.length < 1450, 'Bookmarklet phải ngắn gọn < 1450 ký tự để dán vừa trên Safari iOS');
+  assert.ok(bookmarkletTxt.includes("location.host!='186.186.0.1'"), 'Bookmarklet phải kiểm tra host 186.186.0.1');
+  assert.ok(bookmarkletTxt.includes("F('/login')"), 'Bookmarklet phải fallback sang /login khi /status chưa đăng nhập');
   assert.strictEqual(bookmarkletTxt.match(/%[0-9a-fA-F]{2}/g), null, 'Bookmarklet không được chứa chuỗi %XX gây lỗi decode');
   new vm.Script(bookmarkletTxt.slice('javascript:'.length));
 

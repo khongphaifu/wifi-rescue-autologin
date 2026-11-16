@@ -1,4 +1,8 @@
 (function () {
+  if (location.host !== '186.186.0.1') {
+    location.href = 'http://186.186.0.1/login';
+    return;
+  }
   if (window.__wifiRescueDashboardActive) {
     var existing = document.getElementById('wifi-rescue-ios-overlay');
     if (existing) existing.style.display = 'flex';
@@ -46,15 +50,16 @@
     return mm + ':' + ss;
   }
 
+  var initialInfo = extractStatus(document.documentElement ? document.documentElement.innerHTML : '');
   var state = {
-    loggedIn: false,
-    macEsc: '',
-    mac: '',
-    secLeft: 0,
+    loggedIn: initialInfo.loggedIn,
+    macEsc: initialInfo.macEsc,
+    mac: initialInfo.mac,
+    secLeft: initialInfo.secLeft,
     keepAlive: false,
     renewing: false,
-    rx: '-',
-    tx: '-',
+    rx: initialInfo.rx,
+    tx: initialInfo.tx,
     audioCtx: null,
     silentAudio: null,
     wakeLock: null
@@ -121,6 +126,13 @@
       var res = await fetch('/status?_t=' + Date.now(), { cache: 'no-store' });
       var html = await res.text();
       var info = extractStatus(html);
+      /* When offline, MikroTik /status returns a meta-refresh without wifiInfo; fallback to /login */
+      if (!info.macEsc) {
+        var loginRes = await fetch('/login?_t=' + Date.now(), { cache: 'no-store' });
+        var loginHtml = await loginRes.text();
+        var loginInfo = extractStatus(loginHtml);
+        if (loginInfo.macEsc) info = loginInfo;
+      }
       if (info.macEsc) state.macEsc = info.macEsc;
       if (info.mac) state.mac = info.mac;
       state.loggedIn = info.loggedIn;
